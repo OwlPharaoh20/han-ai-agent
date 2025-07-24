@@ -1,0 +1,4 @@
+🛍️ Han – AI-Powered E-commerce Agent
+Han is a CLI-based AI agent designed to assist with e-commerce product discovery, cart management, and checkout using natural language. Powered by Langchain and OpenAI, Han connects to free product and cart APIs, and utilizes Stripe's sandbox for secure payment simulation. Users can interact with the agent through an intuitive terminal interface built with Inquirer, issuing prompts like “Find me Nike sneakers under $50” or “Add item 42 to cart” and getting intelligent, real-time responses.
+
+The app is built on a Node.js + Express backend with MongoDB for lightweight state storage. It integrates API wrappers for product listings, cart operations, and Stripe payment flows, while maintaining a conversational interface for simplicity. This project is ideal for developers looking to explore AI-powered commerce, agentic systems, and practical API integration through a command-line experience.
