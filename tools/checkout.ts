@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2023-08-16',
+  apiVersion: '2025-06-30.basil',
 });
 
 /**
@@ -41,4 +41,9 @@ export async function createCheckoutSession(cartItems: {
     console.error('❌ Stripe Checkout Error:', error.message);
     return `❌ Failed to create checkout session: ${error.message}`;
   }
+}
+
+export async function checkoutCart(input: string): Promise<string> {
+  // This is a simplified version for the agent to use
+  return "🎉 Checkout functionality would redirect to Stripe payment page.";
 }

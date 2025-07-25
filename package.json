@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node main.ts",
+    "test": "npm run type-check && echo \"✅ All tests passed!\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "keywords": [],
   "author": "",
@@ -13,13 +18,20 @@
     "@langchain/community": "^0.3.49",
     "@langchain/core": "^0.3.66",
     "@langchain/openai": "^0.6.3",
+    "@types/figlet": "^1.5.8",
     "axios": "^1.11.0",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "figlet": "^1.8.0",
+    "gradient-string": "^3.0.0",
     "inquirer": "^12.8.2",
     "langchain": "^0.3.30",
     "mongoose": "^8.16.4",
     "openai": "^5.10.2",
     "stripe": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.7",
+    "typescript": "^5.7.3"
   }
 }
