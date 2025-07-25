@@ -1,5 +1,14 @@
 "use strict";
 // File: main.ts
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -22,24 +31,26 @@ function showBanner() {
     console.log(chalk_1.default.white(`  ❌  Type 'exit' to quit\n`));
 }
 // 🧠 Input loop
-async function startAgentLoop() {
-    showBanner();
-    while (true) {
-        const { userPrompt } = await inquirer_1.default.prompt([
-            {
-                type: 'input',
-                name: 'userPrompt',
-                message: chalk_1.default.greenBright('Ask HAN AI Agent:')
+function startAgentLoop() {
+    return __awaiter(this, void 0, void 0, function* () {
+        showBanner();
+        while (true) {
+            const { userPrompt } = yield inquirer_1.default.prompt([
+                {
+                    type: 'input',
+                    name: 'userPrompt',
+                    message: chalk_1.default.greenBright('Ask HAN AI Agent:')
+                }
+            ]);
+            if (userPrompt.trim().toLowerCase() === 'exit') {
+                console.log(chalk_1.default.blue('\n👋 Exiting HAN AI Agent... Goodbye!'));
+                process.exit(0);
             }
-        ]);
-        if (userPrompt.trim().toLowerCase() === 'exit') {
-            console.log(chalk_1.default.blue('\n👋 Exiting HAN AI Agent... Goodbye!'));
-            process.exit(0);
+            const result = yield (0, agent_1.handlePrompt)(userPrompt);
+            console.log(chalk_1.default.magenta('\n🤖 Response:'), result);
+            console.log(chalk_1.default.gray('\n────────────────────────────────────────────\n'));
         }
-        const result = await (0, agent_1.handlePrompt)(userPrompt);
-        console.log(chalk_1.default.magenta('\n🤖 Response:'), result);
-        console.log(chalk_1.default.gray('\n────────────────────────────────────────────\n'));
-    }
+    });
 }
 // 🚀 Start
 startAgentLoop();

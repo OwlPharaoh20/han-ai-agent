@@ -1,46 +1,50 @@
-// File: /utils/formatter.js
+/**
+ * Utility functions for formatting data displayed to users.
+ */
 
 /**
- * Formats a price number into USD currency format
- * @param {number} amount
- * @returns {string}
+ * Format a monetary amount for display.
  */
-export function formatPrice(amount) {
-    return `$${Number(amount).toFixed(2)}`;
+export function formatPrice(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
+
+/**
+ * Format product details for display.
+ */
+export function formatProduct(product: { title: string; price: number; [key: string]: any }): string {
+  return `📦 **${product.title}**\n💰 ${formatPrice(product.price)}`;
+}
+
+/**
+ * Format cart summary with itemized total.
+ */
+interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+export function formatCartSummary(items: CartItem[]): string {
+  if (items.length === 0) {
+    return "🛒 Your cart is empty.";
   }
-  
-  /**
-   * Formats product details for display in the CLI
-   * @param {Object} product - product object from API
-   * @returns {string}
-   */
-  export function formatProduct(product) {
-    return `\n📦 ${product.title}
-  🆔 ID: ${product.productId}
-  💰 Price: ${formatPrice(product.price)}\n`;
-  }
-  
-  /**
-   * Formats cart items for summary view
-   * @param {Array} items - list of cart items
-   * @returns {string}
-   */
-  export function formatCartSummary(items) {
-    if (!items.length) return '🛒 Your cart is empty.';
-  
-    return (
-      '\n🛒 Cart Items:\n' +
-      items
-        .map(
-          (item, index) =>
-            `${index + 1}. ${item.name} - ${item.quantity} x ${formatPrice(
-              item.price
-            )} = ${formatPrice(item.quantity * item.price)}`
-        )
-        .join('\n') +
-      `\n\n🧾 Total: ${formatPrice(
-        items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-      )}`
-    );
-  }
+
+  const itemizedList = items
+    .map(
+      (item: CartItem, index: number) =>
+        `${index + 1}. ${item.name} - ${formatPrice(item.price)} x ${item.quantity}`
+    )
+    .join("\n");
+
+  const total = formatPrice(
+    items.reduce((sum: number, item: CartItem) => sum + item.price * item.quantity, 0)
+  );
+
+  return `🛒 **Cart Summary:**\n${itemizedList}\n\n💳 **Total: ${total}**`;
+}
   

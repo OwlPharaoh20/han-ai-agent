@@ -1,5 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { Tool, initializeAgentExecutorWithOptions } from "langchain/agents";
+import { DynamicTool } from "@langchain/core/tools";
+import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { config } from "dotenv";
 import { searchProducts } from "./tools/product_search";
 import { viewCart, addToCart, removeFromCart, clearCart } from "./tools/cart";
@@ -8,32 +10,32 @@ import { checkoutCart } from "./tools/checkout";
 config(); // Load .env variables
 
 const tools = [
-  new Tool({
+  new DynamicTool({
     name: "searchProducts",
     description: "Search for e-commerce products by keyword (e.g., 'iPhone')",
     func: searchProducts,
   }),
-  new Tool({
+  new DynamicTool({
     name: "viewCart",
     description: "View all items currently in the cart",
     func: viewCart,
   }),
-  new Tool({
+  new DynamicTool({
     name: "addToCart",
     description: "Add a product to the cart using name, price, and quantity",
     func: addToCart,
   }),
-  new Tool({
+  new DynamicTool({
     name: "removeFromCart",
     description: "Remove a product from the cart by productId",
     func: removeFromCart,
   }),
-  new Tool({
+  new DynamicTool({
     name: "clearCart",
     description: "Clear all items in the cart",
     func: clearCart,
   }),
-  new Tool({
+  new DynamicTool({
     name: "checkoutCart",
     description: "Checkout and simulate payment using Stripe",
     func: checkoutCart,
@@ -46,13 +48,25 @@ const model = new ChatOpenAI({
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
-const executorPromise = initializeAgentExecutorWithOptions(tools, model, {
-  agentType: "openai-functions",
-  verbose: true,
-});
+const prompt = ChatPromptTemplate.fromMessages([
+  ["system", "You are a helpful shopping assistant."],
+  ["human", "{input}"],
+  ["placeholder", "{agent_scratchpad}"],
+]);
 
-export async function handlePrompt(prompt: string) {
-  const executor = await executorPromise;
-  const response = await executor.run({ input: prompt });
-  return response;
+export async function handlePrompt(promptText: string) {
+  const agent = await createOpenAIFunctionsAgent({
+    llm: model,
+    tools,
+    prompt,
+  });
+  
+  const agentExecutor = new AgentExecutor({
+    agent,
+    tools,
+    verbose: true,
+  });
+  
+  const response = await agentExecutor.invoke({ input: promptText });
+  return response.output;
 }
