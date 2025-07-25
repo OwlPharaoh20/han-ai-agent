@@ -3,12 +3,12 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import figlet from 'figlet';
-import gradient from 'gradient-string';
-import { handlePrompt } from './agent';
+import { handlePrompt } from './agent.js';
 
 // 🖼️ Fancy welcome banner
-function showBanner() {
+async function showBanner() {
   console.clear();
+  const gradient = (await import('gradient-string')).default;
   console.log(
     gradient.morning(
       figlet.textSync('HAN AI Agent', { horizontalLayout: 'default' })
@@ -31,7 +31,7 @@ function showBanner() {
 
 // 🧠 Input loop
 async function startAgentLoop() {
-  showBanner();
+  await showBanner();
 
   while (true) {
     const { userPrompt } = await inquirer.prompt([
