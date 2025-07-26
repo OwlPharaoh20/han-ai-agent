@@ -54,7 +54,7 @@ const model = new ChatOpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
 });
 const prompt = ChatPromptTemplate.fromMessages([
-    ["system", "You are a helpful shopping assistant."],
+    ["system", "You are a helpful shopping assistant. When a user asks to view their cart, use the viewCart tool. When they want to search for products, use the searchProducts tool. Always provide helpful responses and use the appropriate tools when needed."],
     ["human", "{input}"],
     ["placeholder", "{agent_scratchpad}"],
 ]);
@@ -69,8 +69,15 @@ export function handlePrompt(promptText) {
             agent,
             tools,
             verbose: true,
+            returnIntermediateSteps: false,
         });
-        const response = yield agentExecutor.invoke({ input: promptText });
-        return response.output;
+        try {
+            const response = yield agentExecutor.invoke({ input: promptText });
+            return response.output || "I couldn't process your request. Please try again.";
+        }
+        catch (error) {
+            console.error("Agent error:", error);
+            return "Sorry, I encountered an error while processing your request. Please try again.";
+        }
     });
 }
