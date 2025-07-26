@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  han-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: han-ai-agent
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RAPID_API_KEY=${RAPID_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/han-agent}
+      - PORT=3000
+    depends_on:
+      - mongo
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - han-network
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "start:web"]
+
+  mongo:
+    image: mongo:7.0
+    container_name: han-mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=han-agent
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - han-network
+    ports:
+      - "27017:27017"
+
+  # Optional: MongoDB Express for database management
+  mongo-express:
+    image: mongo-express:latest
+    container_name: han-mongo-express
+    restart: unless-stopped
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password123
+    depends_on:
+      - mongo
+    networks:
+      - han-network
+    ports:
+      - "8081:8081"
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  han-network:
+    driver: bridge 

@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
+    "start:web": "node dist/server.js",
     "dev": "ts-node main.ts",
+    "dev:web": "ts-node server.ts",
     "test": "npm run type-check && echo \"✅ All tests passed!\"",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
